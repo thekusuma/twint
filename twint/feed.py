@@ -1,11 +1,8 @@
 from bs4 import BeautifulSoup
 from re import findall
 from json import loads
-<<<<<<< HEAD
 import pickle
 from . import get
-=======
->>>>>>> parent of 1f61698... few modification, idk, forgot
 
 import logging as logme
 
