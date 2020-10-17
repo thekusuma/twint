@@ -104,6 +104,7 @@ def update(object, config):
             #"user_rt": Tweet.user_rt,
             #"retweet_id": Tweet.retweet_id,
             "reply_to": Tweet.reply_to,
+            "reply_to_link": 'wtfff', # Tweet.reply_to_link,
             #"retweet_date": Tweet.retweet_date,
             "translate": Tweet.translate,
             "trans_src": Tweet.trans_src,

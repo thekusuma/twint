@@ -241,6 +241,9 @@ def Tweet(tw, config):
     # TODO: check this whether we need the list of all the users to whom this tweet is a reply or we only need
     #  the immediately above user id
     t.reply_to = {'user_id': tw['in_reply_to_user_id_str'], 'username': tw['in_reply_to_screen_name']}
+    t.reply_to_link = tw['reply_to_link']
+    t.replied_tweet = tw['replied_tweet']
+    t.replied_username = tw['replied_username']
     t.translate = ''
     t.trans_src = ''
     t.trans_dest = ''

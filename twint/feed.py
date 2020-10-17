@@ -1,6 +1,11 @@
 from bs4 import BeautifulSoup
 from re import findall
 from json import loads
+<<<<<<< HEAD
+import pickle
+from . import get
+=======
+>>>>>>> parent of 1f61698... few modification, idk, forgot
 
 import logging as logme
 
@@ -98,6 +103,9 @@ def search_v2(response):
             _id = timeline_entry['content']['item']['content']['tweet']['id']
             temp_obj = response['globalObjects']['tweets'][_id]
             temp_obj['user_data'] = response['globalObjects']['users'][temp_obj['user_id_str']]
+            temp_obj['reply_to_link'] = f"/{temp_obj['in_reply_to_screen_name']}/status/{temp_obj['in_reply_to_status_id_str']}" if temp_obj['in_reply_to_screen_name'] else None
+            # t.link = f"https://twitter.com/{t.username}/status/{t.id}"
+            # RequestUrlReply
             feed.append(temp_obj)
 
     try:

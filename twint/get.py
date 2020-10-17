@@ -145,6 +145,19 @@ async def RequestUrl(config, init, headers=[]):
 
     return response
 
+async def RequestUrlReply(config, init, headers=[], damzurl=''):
+    logme.debug(__name__ + ':RequestUrlReply')
+    _connector = get_connector(config)
+    params = []
+    _url = ""
+
+    _url = 'https://mobile.twitter.com' + damzurl
+    headers = {"X-Requested-With": "XMLHttpRequest"}
+    response = await Request(_url, params=params, connector=_connector, headers=headers)
+    # print(_url)
+
+    return response
+
 
 def ForceNewTorIdentity(config):
     logme.debug(__name__ + ':ForceNewTorIdentity')

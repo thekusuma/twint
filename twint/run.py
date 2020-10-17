@@ -7,6 +7,9 @@ from . import token
 from .storage import db
 from .feed import NoMoreTweetsException
 
+from bs4 import BeautifulSoup
+from re import findall
+
 import logging as logme
 
 import time
@@ -95,7 +98,82 @@ class Twint:
                         self.feed, self.init = feed.profile(response)
                 elif self.config.TwitterSearch:
                     try:
-                        self.feed, self.init = feed.search_v2(response)
+
+                        fed, ini = feed.search_v2(response)
+
+                        reply_feed = []
+                        for tweet in fed:
+                            if tweet['reply_to_link']:
+                                # response = 'testduls'
+                                try:
+                                    response = await get.RequestUrlReply(self.config, self.init, headers=[("User-Agent", self.user_agent)], damzurl = tweet['reply_to_link'])
+                                except TokenExpiryException as e:
+                                    logme.debug(__name__ + 'Twint:Feed:' + str(e))
+                                    self.token.refresh()
+                                    response = await get.RequestUrlReply(self.config, self.init, headers=[("User-Agent", self.user_agent)], damzurl = tweet['reply_to_link'])
+                                # tweet['replied_tweet'] = response
+                                # reply_feed.append(tweet)
+                                # print(response)
+
+                                soup = BeautifulSoup(response, "html.parser")
+                                inreplytos = soup.find('div', {"id": "main-content"})
+
+                                tweet_replied_dict = {}
+
+                                if inreplytos:
+                                    tweets_replied = inreplytos.find_all("table", "main-tweet")
+                                    if not tweets_replied:
+                                        continue
+                                    else:
+                                        tweets_replied = tweets_replied[-1]
+                                        # print(tweets_replied)
+                                        try:
+                                            # tweet_replied_dict['data-item-id'] = tweets_replied.find("div", {"class": "tweet-text"})['data-id']
+                                            # t_url = tweets_replied.find("span", {"class": "metadata"}).find("a")["href"]
+                                            # tweet_replied_dict['data-conversation-id'] = t_url.split('?')[0].split('/')[-1]
+                                            tweet_replied_dict['replied_username'] = tweets_replied.find("span", {"class": "username"}).text.replace('\n', '').replace(' ',
+                                                                                                                                            '')
+                                            tweet_replied_dict['replied_tweet'] = tweets_replied.find("div", {"class": "tweet-text"}).find("div", {"class": "dir-ltr"}).text
+                                            # date_str = tweets_replied.find("td", {"class": "timestamp"}).find("a").text
+
+                                            # tweet_replied_dict["avatar"] = tweets_replied.find("td", {"class": "avatar"}).find("img")["src"]
+
+                                            # if len(date_str) <= 3 and (date_str[-1] == "m" or date_str[-1] == "h"):  # 25m 1h
+                                            #     dateu = str(datetime.date.today())
+                                            #     tweet_replied_dict['date'] = dateu
+                                            # elif ',' in date_str:  # Aug 21, 2019
+                                            #     sp = date_str.replace(',', '').split(' ')
+                                            #     date_str_formatted = sp[1] + ' ' + sp[0] + ' ' + sp[2]
+                                            #     dateu = datetime.datetime.strptime(date_str_formatted, "%d %b %Y").strftime("%Y-%m-%d")
+                                            #     tweet_replied_dict['date'] = dateu
+                                            # elif len(date_str.split(' ')) == 3:  # 28 Jun 19
+                                            #     sp = date_str.split(' ')
+                                            #     if len(sp[2]) == 2:
+                                            #         sp[2] = '20' + sp[2]
+                                            #     date_str_formatted = sp[0] + ' ' + sp[1] + ' ' + sp[2]
+                                            #     dateu = datetime.datetime.strptime(date_str_formatted, "%d %b %Y").strftime("%Y-%m-%d")
+                                            #     tweet_replied_dict['date'] = dateu
+                                            # else:  # Aug 21
+                                            #     sp = date_str.split(' ')
+                                            #     date_str_formatted = sp[1] + ' ' + sp[0] + ' ' + str(datetime.date.today().year)
+                                            #     dateu = datetime.datetime.strptime(date_str_formatted, "%d %b %Y").strftime("%Y-%m-%d")
+                                            #     tweet_replied_dict['date'] = dateu
+                                        except Exception as e:
+                                            logme.critical(__name__ + ':Twint:favorite:search_field_lack' + str(e))
+
+                                    # print(tweet_replied_dict)
+                                    # sys.exit("Error message")
+                                    tweet['replied_tweet'] = tweet_replied_dict['replied_tweet']
+                                    tweet['replied_username'] = tweet_replied_dict['replied_username']
+                                # tweet['replied_tweet'] = 'dummy'
+                                # tweet['replied_username'] = 'dummy'
+                                    reply_feed.append(tweet)
+
+                        # tweet_replied_dict
+                        
+                        self.feed = reply_feed
+                        self.init = ini
+
                     except NoMoreTweetsException as e:
                         logme.debug(__name__ + ':Twint:Feed:' + str(e))
                         print(e, 'is it though? because sometimes twitter lie.')
