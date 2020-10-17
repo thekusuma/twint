@@ -133,7 +133,7 @@ class Twint:
                                             # tweet_replied_dict['data-conversation-id'] = t_url.split('?')[0].split('/')[-1]
                                             usern = tweets_replied.find("span", {"class": "username"})
                                             if usern:
-                                                tweet_replied_dict['replied_username'] = .text.replace('\n', '').replace(' ','')
+                                                tweet_replied_dict['replied_username'] = usern.text.replace('\n', '').replace(' ','')
                                             else:
                                                 tweet_replied_dict['replied_username'] = None
                                             replied = tweets_replied.find("div", {"class": "tweet-text"}).find("div", {"class": "dir-ltr"})
