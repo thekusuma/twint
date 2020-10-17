@@ -131,9 +131,16 @@ class Twint:
                                             # tweet_replied_dict['data-item-id'] = tweets_replied.find("div", {"class": "tweet-text"})['data-id']
                                             # t_url = tweets_replied.find("span", {"class": "metadata"}).find("a")["href"]
                                             # tweet_replied_dict['data-conversation-id'] = t_url.split('?')[0].split('/')[-1]
-                                            tweet_replied_dict['replied_username'] = tweets_replied.find("span", {"class": "username"}).text.replace('\n', '').replace(' ',
-                                                                                                                                            '')
-                                            tweet_replied_dict['replied_tweet'] = tweets_replied.find("div", {"class": "tweet-text"}).find("div", {"class": "dir-ltr"}).text
+                                            usern = tweets_replied.find("span", {"class": "username"})
+                                            if usern:
+                                                tweet_replied_dict['replied_username'] = .text.replace('\n', '').replace(' ','')
+                                            else:
+                                                tweet_replied_dict['replied_username'] = None
+                                            replied = tweets_replied.find("div", {"class": "tweet-text"}).find("div", {"class": "dir-ltr"})
+                                            if replied:
+                                                tweet_replied_dict['replied_tweet'] = replied.text
+                                            else:
+                                                tweet_replied_dict['replied_tweet'] = None
                                             # date_str = tweets_replied.find("td", {"class": "timestamp"}).find("a").text
 
                                             # tweet_replied_dict["avatar"] = tweets_replied.find("td", {"class": "avatar"}).find("img")["src"]
