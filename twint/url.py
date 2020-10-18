@@ -176,6 +176,7 @@ async def Search(config, init):
 
     params.append(("q", q))
     _serialQuery = _sanitizeQuery(url, params)
+    print('hitting: ', _serialQuery)
     return url, params, _serialQuery
 
 
